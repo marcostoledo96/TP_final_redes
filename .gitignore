@@ -1,0 +1,18 @@
+node_modules/
+.env
+*.db
+*.log
+coverage/
+dist/
+.DS_Store
+*.tmp
+*.swp
+
+# SQLite artifacts and runtime data
+data/*.sqlite*
+
+# OpenCode local cache
+.atl/
+
+# OpenSpec workspace (local SDD artifacts; not part of delivery)
+openspec/

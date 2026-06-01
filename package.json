@@ -1,0 +1,24 @@
+{
+  "name": "the-guardian",
+  "version": "1.0.0",
+  "description": "TP de Programación sobre Redes con Node.js",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/primary.js",
+    "dev": "nodemon src/server.js",
+    "evaluate": "node scripts/evaluate.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.6.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
