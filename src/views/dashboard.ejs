@@ -1,23 +1,52 @@
 <!DOCTYPE html>
+<!--
+  ===== SECCIÓN: dashboard.ejs — Plantilla del Dashboard =====
+  ¿Qué es esto?
+    Este archivo es una PLANTILLA EJS (Embedded JavaScript). Node.js lo procesa
+    en el servidor, reemplaza las variables entre <%= ... %> por valores reales,
+    y envía HTML plano al navegador. El navegador NUNCA ve el código EJS.
+
+  ¿Qué es EJS?
+    EJS = Embedded JavaScript. Es como HTML pero con "huecos" donde insertar
+    datos dinámicos del servidor. Los "huecos" se escriben con:
+    - <%= variable %> → inserta el valor escapado (seguro para HTML).
+    - <% código %> → ejecuta JavaScript sin mostrar resultado (bucles, condiciones).
+
+  ¿Por qué no usamos React o Vue acá?
+    El TP pide EJS. Es un motor de plantillas server-side: todo el HTML se
+    genera en el servidor antes de enviarlo al navegador. Es más simple
+    para un TP backend: no hay que manejar estado del lado del cliente.
+
+  Variables que recibimos del servidor (dashboard.service.js):
+    - systemStatus, pid, localCounter, acceptedCount, completedCount
+    - failedCount, totalRestarts, activeWorkers, recentEvents, recentRestarts
+-->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Guardian — Dashboard</title>
+  <!-- Carga el CSS estático desde /css/dashboard.css (carpeta public/) -->
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
   <div class="container">
+    <!-- ===== SECCIÓN: Encabezado ===== -->
     <header>
       <h1>The Guardian — Dashboard</h1>
       <p class="subtitle">Sistema de monitoreo y evaluación de carga</p>
     </header>
 
+    <!-- ===== SECCIÓN: Estado del sistema ===== -->
+    <!-- Muestra si el sistema está OK o degradado, y el PID del worker
+         que respondió este request (recordá: pueden ser varios workers). -->
     <section class="status">
       <h2>Estado del sistema</h2>
       <div class="status-grid">
         <div class="status-item">
           <span class="label">Estado:</span>
+          <!-- Clase CSS dinámica: 'ok' (verde) si systemStatus es 'ok'
+               o 'warn' (naranja) si es cualquier otra cosa -->
           <span class="value <%= systemStatus === 'ok' ? 'ok' : 'warn' %>"><%= systemStatus %></span>
         </div>
         <div class="status-item">
@@ -27,6 +56,10 @@
       </div>
     </section>
 
+    <!-- ===== SECCIÓN: Métricas en tarjetas ===== -->
+    <!-- Cada tarjeta muestra un contador importante del sistema.
+         El ?? 0 es el operador "nullish coalescing": si el valor es null
+         o undefined, muestra 0. Si es 0 explícito, muestra 0 igualmente. -->
     <section class="metrics">
       <h2>Métricas</h2>
       <div class="metrics-grid">
@@ -57,6 +90,7 @@
       </div>
     </section>
 
+    <!-- ===== SECCIÓN: Links a endpoints ===== -->
     <section class="links">
       <h2>Endpoints</h2>
       <div class="link-list">
@@ -66,6 +100,7 @@
       </div>
     </section>
 
+    <!-- ===== SECCIÓN: Comandos de prueba ===== -->
     <section class="commands">
       <h2>Comandos de prueba</h2>
       <pre>
@@ -75,6 +110,9 @@ npm run evaluate
       </pre>
     </section>
 
+    <!-- ===== SECCIÓN: Últimos eventos ===== -->
+    <!-- recentEvents es un array de objetos que viene de SQLite.
+         Si está vacío, mostramos un mensaje. Si no, una tabla HTML. -->
     <section class="events">
       <h2>Últimos eventos (<%= recentEvents.length %>)</h2>
       <% if (recentEvents.length === 0) { %>
@@ -105,6 +143,7 @@ npm run evaluate
       <% } %>
     </section>
 
+    <!-- ===== SECCIÓN: Últimos reinicios ===== -->
     <section class="restarts">
       <h2>Últimos reinicios (<%= recentRestarts.length %>)</h2>
       <% if (recentRestarts.length === 0) { %>

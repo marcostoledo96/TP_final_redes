@@ -1,24 +1,51 @@
-/* Estilos mínimos del dashboard The Guardian */
+/*
+  ===== SECCIÓN: Estilos del Dashboard The Guardian =====
 
+  ¿Qué es esto?
+    Este archivo contiene las reglas CSS que estilizan el dashboard EJS.
+    Es un archivo CSS "vanilla" (sin framework como Bootstrap o Tailwind).
+    El TP pide un dashboard simple, así que los estilos son minimalistas
+    y funcionales.
+
+  ¿Cómo se carga?
+    En dashboard.ejs hay esta línea:
+      <link rel="stylesheet" href="/css/dashboard.css">
+    Express resuelve /css/dashboard.css desde public/css/dashboard.css
+    gracias al middleware express.static() configurado en app.js.
+*/
+
+/* ===== RESET BÁSICO ===== */
+/* "box-sizing: border-box" hace que padding y border NO aumenten el tamaño total
+   de los elementos. Es el default moderno recomendado en casi todo proyecto. */
 * {
   box-sizing: border-box;
 }
 
+/* ===== ESTILOS GENERALES DEL BODY ===== */
+/* -apple-system = usa la fuente del sistema en Mac/iPhone.
+   "Segoe UI" = fuente de Windows.
+   "Roboto" = fuente de Android/Google.
+   "Helvetica" / "Arial" = fallback universal.
+   Si ninguna está disponible, usa la fuente sans-serif por defecto del SO. */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f5f6f8;
-  color: #222;
-  line-height: 1.5;
+  background: #f5f6f8;   /* Gris muy claro para la página */
+  color: #222;           /* Negro suave para el texto principal */
+  line-height: 1.5;      /* Espacio entre líneas para legibilidad */
 }
 
+/* ===== CONTENEDOR PRINCIPAL ===== */
+/* Centramos el contenido y le damos un ancho máximo para que no se estire
+   feo en pantallas grandes. En mobile se ajusta solo. */
 .container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 16px;
 }
 
+/* ===== ENCABEZADO ===== */
 header {
   margin-bottom: 24px;
 }
@@ -34,21 +61,25 @@ header h1 {
   font-size: 0.95rem;
 }
 
+/* ===== SECCIONES ===== */
+/* Cada <section> del dashboard es una tarjeta blanca con sombra sutil. */
 section {
   background: #fff;
   border-radius: 8px;
   padding: 16px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);  /* Sombra muy sutil */
 }
 
 section h2 {
   margin: 0 0 12px 0;
   font-size: 1.15rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee;  /* Línea separadora debajo del título */
   padding-bottom: 8px;
 }
 
+/* ===== ESTADO DEL SISTEMA ===== */
+/* Flex layout para que estado y PID queden uno al lado del otro. */
 .status-grid {
   display: flex;
   gap: 24px;
@@ -71,6 +102,7 @@ section h2 {
   font-size: 1rem;
 }
 
+/* Verde para estado "ok". Naranja para estado "warn" o "degraded". */
 .value.ok {
   color: #0a7a3e;
 }
@@ -79,6 +111,9 @@ section h2 {
   color: #c17800;
 }
 
+/* ===== TARJETAS DE MÉTRICAS ===== */
+/* Grid responsive: se ajusta automáticamente al ancho disponible.
+   Cada tarjeta mide al menos 160px. Si hay espacio, pone más por fila. */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -92,6 +127,7 @@ section h2 {
   text-align: center;
 }
 
+/* Número grande y destacado en azul. */
 .metric-value {
   display: block;
   font-size: 1.6rem;
@@ -106,6 +142,7 @@ section h2 {
   color: #555;
 }
 
+/* ===== LINKS A ENDPOINTS ===== */
 .link-list {
   display: flex;
   gap: 12px;
@@ -114,41 +151,45 @@ section h2 {
 
 .link-list a {
   display: inline-block;
-  background: #e8f0fe;
-  color: #1a73e8;
-  text-decoration: none;
+  background: #e8f0fe;   /* Azul muy claro */
+  color: #1a73e8;        /* Azul Google */
+  text-decoration: none; /* Sin subrayado */
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.9rem;
-  font-family: monospace;
+  font-family: monospace; /* Fuente de código para las rutas */
 }
 
+/* Al pasar el mouse, cambia a un azul un poco más oscuro. */
 .link-list a:hover {
   background: #d2e3fc;
 }
 
+/* ===== BLOQUE DE CÓDIGO (comandos de prueba) ===== */
 pre {
   background: #f4f4f5;
   padding: 12px 14px;
   border-radius: 6px;
-  overflow-x: auto;
+  overflow-x: auto;       /* Si el código es muy ancho, agrega scroll horizontal */
   font-size: 0.88rem;
   line-height: 1.6;
   margin: 0;
 }
 
+/* ===== TABLAS (eventos y reinicios) ===== */
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse;  /* Une los bordes de las celdas */
   font-size: 0.9rem;
 }
 
 th, td {
   text-align: left;
   padding: 8px 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee;  /* Línea divisoria sutil */
 }
 
+/* Encabezados: gris, en mayúsculas, más finos. */
 th {
   color: #666;
   font-weight: 600;
@@ -156,16 +197,19 @@ th {
   text-transform: uppercase;
 }
 
+/* Al pasar el mouse por una fila, cambia a gris claro. */
 tr:hover {
   background: #fafafa;
 }
 
+/* ===== MENSAJE EMPTY ===== */
 .empty {
   color: #888;
   font-style: italic;
   margin: 0;
 }
 
+/* ===== PIE DE PÁGINA ===== */
 footer {
   text-align: center;
   color: #999;
