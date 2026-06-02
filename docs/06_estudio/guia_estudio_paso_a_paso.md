@@ -41,7 +41,9 @@ Esto es tu mapa. Si te perdés, volvé acá.
 
 **Checkpoint:**
 - ¿Podés explicar qué es el Primary usando la analogía del restaurante?
+  **Respuesta:** El Primary es el gerente del restaurante. No atiende clientes directamente (no maneja requests HTTP), pero controla todo: decide cuántos mozos (Workers) contratar (half de CPUs), reemplaza los que se enferman (self-healing), y lleva la caja registradora (SQLite). Los Workers (mozos) son los que sí hablan con los clientes.
 - ¿Podés dibujar en un papel cómo llega un request desde el cliente hasta SQLite?
+  **Respuesta:** Cliente (navegador) → Express (puerta del restaurante) → Route (mozo te lleva a tu mesa) → Controller (mozo toma tu pedido) → Service (mozo lleva el pedido al cocinero) → Worker Thread (cocinero cocina) → IPC (cocinero avisa al gerente) → Primary (gerente guarda en la caja) → SQLite (caja registradora).
 
 ---
 
@@ -59,7 +61,9 @@ Es el DNA del proyecto: qué dependencias usamos, qué comandos ejecutamos, qué
 
 **Checkpoint:**
 - ¿Qué comando levanta el servidor en modo cluster?
+  **Respuesta:** `npm start` ejecuta `node src/primary.js`, que levanta el Primary, fork Workers, y activa Worker Threads fijos en cada uno.
 - ¿Qué dependencia NO está acá (TypeScript, MongoDB, Redis)?
+  **Respuesta:** Ninguna de esas. El TP usa CommonJS (no TypeScript), SQLite (no MongoDB), y comunicación local por IPC/SharedArrayBuffer (no Redis). Es a propósito: el TP demuestra conceptos académicos sin necesidad de infraestructura externa.
 
 ---
 
@@ -369,6 +373,7 @@ Estos son importantes pero menos críticos para la defensa.
 5. **DESCANSO**
 6. `src/workers/compute.worker.js` (otra pasada, 15 min)
 7. **Checkpoint**: ¿Podés explicarle a un amigo qué es Atomics.add()?
+   **Respuesta:** "Atomics.add() es como el botón de un semáforo: solo una persona puede apretarlo a la vez. Si dos threads quieren incrementar un contador al mismo tiempo, sin Atomics podrían leer el mismo valor y perder una escritura (race condition: 5+1=6 en vez de 7). Con Atomics, la CPU garantiza que la operación de leer+sumar+escribir se hace en un solo paso indivisible."
 
 ### Día 2: El flujo HTTP (2-3 horas)
 1. `src/server.js` (15 min)
@@ -378,6 +383,7 @@ Estos son importantes pero menos críticos para la defensa.
 5. `src/controllers/ingest.controller.js` (10 min)
 6. `src/services/ingest.service.js` (15 min)
 7. **Checkpoint**: ¿Podés dibujar el flujo de un request desde el navegador hasta SQLite?
+   **Respuesta:** Navegador → Express (app) → Router (`/ingest`) → Middleware (valida `?id=`) → Controller (decide aceptar/rechazar) → IngestService (manda tarea) → WorkerThreadService (manda al Cocinero/Worker Thread) → WorkerThread (hace el cálculo y avisa) → IPC → Primary (suma contador global y guarda en SQLite).
 
 ### Día 3: El cerebro (3 horas)
 1. `src/services/worker-thread.service.js` (30 min)
@@ -387,17 +393,18 @@ Estos son importantes pero menos críticos para la defensa.
 5. `src/services/metrics.service.js` (20 min)
 6. `src/views/dashboard.ejs` (15 min)
 7. **Checkpoint**: ¿Podés explcar por qué el Primary escribe en SQLite y los Workers no?
+   **Respuesta:** "Si todos los Workers (8 procesos) escribieran al mismo tiempo en SQLite, se pisarían los datos (race condition en la base). El Primary centraliza las escrituras: los Workers solo mandan mensajes IPC ('completé un evento'), y el Primary, que es un solo proceso con un solo hilo de escritura, guarda todo ordenado en SQLite."
 
 ### Día 4: Extras + Ensayo (2-3 horas)
 1. Los archivos del nivel 4 (1 hora, a tu ritmo)
 2. Leé `guia_demostracion_profesor.md` COMPLETO (30 min)
 3. **Ensayo oral**: Parate frente a un espejo o grabate con el celu. Contestá estas preguntas:
-   - "¿Por qué usaron cluster?"
-   - "¿Por qué Worker Threads?"
-   - "¿Qué es Atomics.add()?"
-   - "¿Por qué 202 Accepted?"
-   - "¿Qué pasa si el Worker Thread muere?"
-   - "¿Por qué salió FALLIDO el evaluate?"
+   - **"¿Por qué usaron cluster?"** → "Node.js es single-threaded. Un solo proceso solo usa un núcleo de CPU. Con cluster creamos un Primary que forkea Workers, así aprovechamos múltiples CPUs."
+   - **"¿Por qué Worker Threads?"** → "Porque el cálculo de 10M iteraciones es CPU-bound. Si lo hiciéramos en el Event Loop, bloquearía todos los requests HTTP. El Worker Thread corre en paralelo y no bloquea."
+   - **"¿Qué es Atomics.add()?"** → Ver respuesta del Día 1.
+   - **"¿Por qué 202 Accepted?"** → "202 significa 'acepté pero todavía no terminó'. Es asíncrono: el servidor responde al instante, pero el Worker Thread procesa después. 200 significaría 'ya está listo', lo cual sería mentira."
+   - **"¿Qué pasa si el Worker Thread muere?"** → "Bounded respawn: el servicio detecta la muerte, reinicia el Worker Thread (hasta 3 veces), y si sigue muriendo, los mandan por parentPort y el Cluster Worker manda un mensaje 'INGEST_FAILED' al Primary."
+   - **"¿Por qué salió FALLIDO el evaluate?"** → "Porque el timeout es 30 segundos y con 8 Workers procesando 500 eventos tardan ~30-40 segundos. El servidor SIGUE procesando. Si espero 10 segundos más y consulto `/metrics`, el drift es 0 y completedEvents es 500."
 4. Corré `npm start` y `npm run evaluate` vos solo. Mirá los resultados.
 5. **Checkpoint**: ¿Podés hacer toda la demo sin mirar la guía?
 
