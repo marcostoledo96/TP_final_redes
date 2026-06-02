@@ -3,14 +3,14 @@
   ===== SECCIÓN: dashboard.ejs — Plantilla del Dashboard =====
   ¿Qué es esto?
     Este archivo es una PLANTILLA EJS (Embedded JavaScript). Node.js lo procesa
-    en el servidor, reemplaza las variables entre <%= ... %> por valores reales,
+    en el servidor, reemplaza las variables entre "&lt;%= variable %&gt;" por valores reales,
     y envía HTML plano al navegador. El navegador NUNCA ve el código EJS.
 
   ¿Qué es EJS?
     EJS = Embedded JavaScript. Es como HTML pero con "huecos" donde insertar
-    datos dinámicos del servidor. Los "huecos" se escriben con:
-    - <%= variable %> → inserta el valor escapado (seguro para HTML).
-    - <% código %> → ejecuta JavaScript sin mostrar resultado (bucles, condiciones).
+    datos dinámicos del servidor.     Los "huecos" se escriben con:
+    - &lt;%= variable %&gt; → inserta el valor escapado (seguro para HTML).
+    - &lt;% código %&gt; → ejecuta JavaScript sin mostrar resultado (bucles, condiciones).
 
   ¿Por qué no usamos React o Vue acá?
     El TP pide EJS. Es un motor de plantillas server-side: todo el HTML se

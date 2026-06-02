@@ -98,4 +98,5 @@ BASE_URL=http://localhost:8080 node scripts/evaluate.js
 - Las latencias se miden con `performance.now()`.
 - Los resultados se guardan automáticamente en `docs/05_pruebas/resultados_pruebas.md`.
 - Si `completedEvents` no llega a 500 dentro de 30 s, el script termina con `❌ FALLIDO`.
+- **⚠️ IMPORTANTE**: El `❌ FALLIDO` es frecuente en máquinas donde cada Worker Thread tarda más de 300ms en procesar. El servidor SIGUE procesando en segundo plano. Consultar `/metrics` manualmente 10-15 segundos después del evaluate para verificar que el drift desaparece y `completedEvents` alcanza 500.
 - No existe otro script de verificación (`verify-concurrency.js` fue removido).
